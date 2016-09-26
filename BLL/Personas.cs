@@ -33,7 +33,15 @@ namespace BLL
 
         public override bool insertar()
         {
-            throw new NotImplementedException();
+            try
+            {
+                bool retorno = false;
+                retorno = conexion.Ejecutar(String.Format("insert into Personas(Nombres,Sexo)values('{0}',{1})", this.Nombres, this.Sexo));
+                return retorno;
+            }catch(Exception ex)
+            {
+                throw ex;
+            }
         }
 
         public override bool modificar()
