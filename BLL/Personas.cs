@@ -15,6 +15,7 @@ namespace BLL
         public int PersonaId { get; set; }
         public string Nombres { get; set; }
         public int Sexo { get; set; }
+        public List<PersonasTelefonos>ListaTelefono { get; set; }
       
 
         public Personas()
@@ -22,6 +23,7 @@ namespace BLL
             this.PersonaId = 0;
             this.Nombres = "";
             this.Sexo = 0;
+            ListaTelefono = new List<PersonasTelefonos>();
         }
 
         public Personas(int PersonaId,string Nombres,int Sexo)
@@ -31,17 +33,35 @@ namespace BLL
             this.Sexo = Sexo;
         }
 
-        public override bool insertar()
+        public void AgregarTelefonos(string TiposTelefono,string Telefono)
         {
+            ListaTelefono.Add(new PersonasTelefonos(TiposTelefono, Telefono));
+        }
+
+        public override bool insertar() { 
+        int retorno = 0;
+        object identity;
             try
             {
-                bool retorno = false;
-                retorno = conexion.Ejecutar(String.Format("insert into Personas(Nombres,Sexo)values('{0}',{1})", this.Nombres, this.Sexo));
-                return retorno;
-            }catch(Exception ex)
+                //obtengo el identity insertado en la tabla personas
+                identity = conexion.ObtenerValor(
+                    string.Format("Insert Into Personas(Nombres,Sexo) values('{0}',{1}) select @@Identity", this.Nombres, this.Sexo));
+
+                //intento convertirlo a entero
+                int.TryParse(identity.ToString(), out retorno);
+
+                this.PersonaId = retorno;
+                foreach (PersonasTelefonos item in this.ListaTelefono)
+                {
+                    conexion.Ejecutar(string.Format("Insert into PersonasTelefonos(PersonaId,TiposTelefono,Telefono) Values ({0},'{1}','{2}')", retorno, item.TiposTelefono, item.Telefono));
+                }
+
+} catch (Exception ex)
             {
+
                 throw ex;
             }
+            return retorno > 0;
         }
 
         public override bool modificar()
