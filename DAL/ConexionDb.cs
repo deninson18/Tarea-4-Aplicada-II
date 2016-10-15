@@ -77,7 +77,7 @@ namespace DAL
                 cmd.Connection = conexion;
                 cmd.CommandText = ComandoSql;
                 retorno = cmd.ExecuteScalar();
-                retorno = true;
+          
             }
             catch (Exception ex)
             {

@@ -22,31 +22,49 @@ namespace RegistroTelefono.PaginaPersonas
                 ViewState["Personas"] = dt;
             }
         }
-
-
-        protected void guardar_Click(object sender, EventArgs e)
+        public void CargarDatos(Personas persona)
         {
-            Personas persona = new Personas();
-            int id = 0;
-            int.TryParse(IdTextBox.Text, out id);
-            persona.PersonaId= id;
-
             persona.Nombres = nombreTextBox.Text;
-
-
             if (mRadioButton.Checked)
             {
-                persona.Sexo = 1;
+                persona.Sexo =1;
             }
             else
             {
-                persona.Sexo = 0;
+                persona.Sexo =0;
             }
             foreach (GridViewRow row in GridView1.Rows)
             {
                 persona.AgregarTelefonos(row.Cells[0].Text, row.Cells[1].Text);
             }
+        }
 
+        public void DevolverDatos(Personas persona)
+        {
+            IdTextBox.Text = persona.PersonaId.ToString();
+            nombreTextBox.Text = persona.Nombres;
+            
+            foreach (var item in persona.ListaTelefono)
+            {
+                DataTable dt = (DataTable)ViewState["Persona"];
+                dt.Rows.Add(item.TiposTelefono, item.Telefono);
+                ViewState["Persona"] = dt;
+                CargarGrid();
+            }
+        }
+
+        public void CargarGrid()
+        {
+            GridView1.DataSource = (DataTable)ViewState["Persona"];
+            GridView1.DataBind();
+           
+        }
+
+
+        protected void guardar_Click(object sender, EventArgs e)
+        {
+            Personas persona = new Personas();
+            CargarDatos(persona);
             if (persona.insertar())
             {
                 Response.Write("<cript>alert('Guardo Exitosamente')</script>");
@@ -60,11 +78,16 @@ namespace RegistroTelefono.PaginaPersonas
 
         protected void nuevo_Click1(object sender, EventArgs e)
         {
+            DataTable dt = new DataTable();
             IdTextBox.Text = string.Empty;
             nombreTextBox.Text = string.Empty;
             mRadioButton.Checked = false;
             fRadioButton.Checked = false;
             TipoDropDownList.SelectedIndex = 0;
+            
+            dt.Columns.AddRange(new DataColumn[2] { new DataColumn("TIPO"), new DataColumn("TELEFONO") });
+            ViewState["Persona"] = dt;
+            CargarGrid();
             telefonoTextBox.Text = string.Empty;
         }
 

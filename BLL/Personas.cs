@@ -15,7 +15,7 @@ namespace BLL
         public int PersonaId { get; set; }
         public string Nombres { get; set; }
         public int Sexo { get; set; }
-        public List<PersonasTelefonos>ListaTelefono { get; set; }
+        public List<PersonaTelefonos>ListaTelefono { get; set; }
       
 
         public Personas()
@@ -23,52 +23,44 @@ namespace BLL
             this.PersonaId = 0;
             this.Nombres = "";
             this.Sexo = 0;
-            ListaTelefono = new List<PersonasTelefonos>();
+            ListaTelefono = new List<PersonaTelefonos>();
         }
 
-        public Personas(int PersonaId,string Nombres,int Sexo)
-        {
-            this.PersonaId = PersonaId;
-            this.Nombres = Nombres;
-            this.Sexo = Sexo;
-        }
 
         public void AgregarTelefonos(string TiposTelefono,string Telefono)
         {
-            ListaTelefono.Add(new PersonasTelefonos(TiposTelefono, Telefono));
+            ListaTelefono.Add(new PersonaTelefonos(TiposTelefono,Telefono));
         }
 
-        public override bool insertar() { 
-        int retorno = 0;
-        object identity;
-            try
-            {
-                //obtengo el identity insertado en la tabla personas
-                identity = conexion.ObtenerValor(
-                    string.Format("Insert Into Personas(Nombres,Sexo) values('{0}',{1}) select @@Identity", this.Nombres, this.Sexo));
+        public override bool insertar()
+          {
+             int retorno = 0;
 
-                //intento convertirlo a entero
-                int.TryParse(identity.ToString(), out retorno);
+             try
+             {
+                 //obtengo el identity insertado en la tabla personas
+                 retorno = Convert.ToInt32(conexion.ObtenerValor(string.Format("Insert Into Personas(Nombres,Sexo) values('{0}','{1}'); SELECT SCOPE_IDENTITY()", this.Nombres, this.Sexo)));
 
-                this.PersonaId = retorno;
-                foreach (PersonasTelefonos item in this.ListaTelefono)
-                {
-                    conexion.Ejecutar(string.Format("Insert into PersonasTelefonos(PersonaId,TiposTelefono,Telefono) Values ({0},'{1}','{2}')", retorno, item.TiposTelefono, item.Telefono));
-                }
+                   this.PersonaId = retorno;
+                 if (retorno > 0)
+                 {
+                     foreach (PersonaTelefonos item in this.ListaTelefono)
+                     {
+                         conexion.Ejecutar(string.Format("Insert into PersonasTelefonos(PersonaId,TipoTelefono,Telefono) Values ({0},'{1}','{2}')",
+                             retorno, item.TiposTelefono, item.Telefono));
+                     }
+                 }
 
-} catch (Exception ex)
-            {
 
-                throw ex;
-            }
-            return retorno > 0;
-        }
+             }
+             catch (Exception ex)
+             {
 
-        public override bool modificar()
-        {
-            throw new NotImplementedException();
-        }
-
+                 throw ex;
+             }
+             return retorno > 0;
+         }
+        
         public override bool eliminar()
         {
             throw new NotImplementedException();
@@ -80,6 +72,11 @@ namespace BLL
         }
 
         public override DataTable Listado(string Campos, string Condicion, string Orden)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override bool modificar()
         {
             throw new NotImplementedException();
         }

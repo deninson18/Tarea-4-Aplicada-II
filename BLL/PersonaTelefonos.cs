@@ -10,7 +10,7 @@ using System.ComponentModel;
 
 namespace BLL
 {
-   public class PersonasTelefonos
+   public class PersonaTelefonos
     {
         ConexionDb conexion = new ConexionDb();
 
@@ -25,14 +25,14 @@ namespace BLL
         }
 
 
-        public PersonasTelefonos()
+        public PersonaTelefonos()
         {
            
-            this.TiposTelefono = "Casa";
+            this.TiposTelefono = "";
             this.Telefono = "";
         }
 
-        public PersonasTelefonos(string TiposTelefono,string Telefono)
+        public PersonaTelefonos(string TiposTelefono,string Telefono)
         {
             
             this.TiposTelefono = TiposTelefono;
